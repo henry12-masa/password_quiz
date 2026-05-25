@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パスワード強度判定クイズ</title>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8398161859137802"
+crossorigin="anonymous"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#020617,#1e293b);
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:28px 16px;
+  background:linear-gradient(135deg,#0f766e,#2563eb);
+}
+header h1{margin:0;font-size:30px}
+header p{color:#dbeafe}
+.container{max-width:1000px;margin:auto;padding:20px}
+.ad-box{
+  margin:20px auto;
+  padding:10px;
+  min-height:90px;
+  background:#111827;
+  border:1px dashed #475569;
+  border-radius:16px;
+}
+.card{
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:22px;
+  padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.status{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.badge{
+  background:#111827;
+  border:1px solid #334155;
+  border-radius:999px;
+  padding:10px 14px;
+}
+.password-box{
+  background:#f8fafc;
+  color:#111827;
+  border-radius:18px;
+  padding:28px;
+  text-align:center;
+  margin-bottom:20px;
+}
+.password{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:1px;
+  word-break:break-all;
+  background:#e2e8f0;
+  padding:18px;
+  border-radius:14px;
+}
+.hint{
+  color:#475569;
+  margin-top:12px;
+}
+.choices{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.choice{
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  background:#1e293b;
+  color:white;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  border:1px solid #334155;
+}
+.choice:hover{background:#334155}
+.choice.correct{background:#16a34a}
+.choice.wrong{background:#dc2626}
+.explain{
+  margin-top:18px;
+  line-height:1.8;
+  color:#cbd5e1;
+}
+.next,.restart{
+  width:100%;
+  margin-top:18px;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:#f59e0b;
+  color:#111827;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+}
+.result{text-align:center}
+.result h2{font-size:34px}
+.meter{
+  height:14px;
+  background:#334155;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:18px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:#22c55e;
+  transition:.4s;
+}
+@media(max-width:700px){
+  .choices{grid-template-columns:1fr}
+  .password{font-size:24px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>パスワード強度判定クイズ</h1>
+  <p>このパスワードは「弱い？普通？強い？」を見抜こう</p>
+</header>
+
+<div class="container">
+
+  <div class="ad-box">
+    <!-- UIゲーム -->
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-8398161859137802"
+      data-ad-slot="6325875393"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  </div>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+  <div class="status">
+    <div class="badge" id="count">問題 1 / 20</div>
+    <div class="badge" id="score">スコア 0</div>
+  </div>
+
+  <div id="app"></div>
+
+  <div class="ad-box">
+    <!-- UIゲーム -->
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-8398161859137802"
+      data-ad-slot="6325875393"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  </div>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+</div>
+
+<script>
+const questions = [
+  {
+    pass:"123456",
+    answer:"とても弱い",
+    explain:"連番だけのパスワードは非常に推測されやすいです。"
+  },
+  {
+    pass:"password",
+    answer:"とても弱い",
+    explain:"passwordのような単語は攻撃リストに入りやすく危険です。"
+  },
+  {
+    pass:"qwerty123",
+    answer:"弱い",
+    explain:"キーボード配列＋数字はありがちな組み合わせです。"
+  },
+  {
+    pass:"tokyo2024",
+    answer:"弱い",
+    explain:"地名＋年号は推測されやすいパターンです。"
+  },
+  {
+    pass:"Sakura123",
+    answer:"普通",
+    explain:"大文字・小文字・数字はありますが、単語ベースなのでやや弱めです。"
+  },
+  {
+    pass:"NekoLove777",
+    answer:"普通",
+    explain:"文字数はありますが、意味のある単語が多く推測されやすいです。"
+  },
+  {
+    pass:"T9m#qL2!",
+    answer:"強い",
+    explain:"大文字・小文字・数字・記号が混ざり、規則性が少ないです。"
+  },
+  {
+    pass:"bR7!xQ2@pL",
+    answer:"とても強い",
+    explain:"長さがあり、ランダム性も高く、かなり強いパスワードです。"
+  },
+  {
+    pass:"11111111",
+    answer:"とても弱い",
+    explain:"同じ数字の繰り返しはすぐに破られやすいです。"
+  },
+  {
+    pass:"iloveyou",
+    answer:"とても弱い",
+    explain:"よく使われるフレーズは危険です。"
+  },
+  {
+    pass:"Baseball2025",
+    answer:"普通",
+    explain:"長さはありますが、単語＋年号は推測されやすいです。"
+  },
+  {
+    pass:"A1b2C3d4",
+    answer:"普通",
+    explain:"大小文字と数字はありますが、規則的な並びです。"
+  },
+  {
+    pass:"mZ8$vP1#",
+    answer:"強い",
+    explain:"ランダム性があり、記号も含まれています。"
+  },
+  {
+    pass:"MyBirthday0505",
+    answer:"弱い",
+    explain:"誕生日系は個人情報から推測されやすいです。"
+  },
+  {
+    pass:"admin123",
+    answer:"とても弱い",
+    explain:"管理者系の単語＋数字は非常に危険です。"
+  },
+  {
+    pass:"Coffee-Time-92",
+    answer:"強い",
+    explain:"長さがあり、記号と数字も含まれています。ただし単語ベースなので過信は禁物です。"
+  },
+  {
+    pass:"xK9!pQ4@zM2",
+    answer:"とても強い",
+    explain:"長く、ランダムで、複数種類の文字が使われています。"
+  },
+  {
+    pass:"abc12345",
+    answer:"とても弱い",
+    explain:"アルファベット順＋数字の並びはかなり危険です。"
+  },
+  {
+    pass:"OrangeDesk47",
+    answer:"普通",
+    explain:"単語の組み合わせで覚えやすい反面、完全ランダムよりは弱いです。"
+  },
+  {
+    pass:"R!v3r_Moon_2048",
+    answer:"強い",
+    explain:"長さがあり、記号・数字・大小文字を含むため強めです。"
+  }
+];
+
+const choices = ["とても弱い","弱い","普通","強い","とても強い"];
+
+let index = 0;
+let score = 0;
+let answered = false;
+
+function strengthPercent(answer){
+  if(answer==="とても弱い") return 15;
+  if(answer==="弱い") return 35;
+  if(answer==="普通") return 55;
+  if(answer==="強い") return 78;
+  return 95;
+}
+
+function shuffle(arr){
+  return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function render(){
+  answered = false;
+  const q = questions[index];
+
+  document.getElementById("count").textContent = `問題 ${index+1} / ${questions.length}`;
+  document.getElementById("score").textContent = `スコア ${score}`;
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <div class="password-box">
+        <div class="password">${q.pass}</div>
+        <div class="hint">このパスワードの強度は？</div>
+        <div class="meter">
+          <div class="bar" id="bar"></div>
+        </div>
+      </div>
+
+      <div class="choices">
+        ${choices.map(c => `<button class="choice" onclick="answer(this,'${c}')">${c}</button>`).join("")}
+      </div>
+
+      <div class="explain" id="explain"></div>
+    </div>
+  `;
+}
+
+function answer(btn, selected){
+  if(answered) return;
+  answered = true;
+
+  const q = questions[index];
+  const buttons = document.querySelectorAll(".choice");
+
+  buttons.forEach(b=>{
+    if(b.textContent === q.answer) b.classList.add("correct");
+    if(b === btn && selected !== q.answer) b.classList.add("wrong");
+  });
+
+  if(selected === q.answer){
+    score++;
+  }
+
+  document.getElementById("score").textContent = `スコア ${score}`;
+  document.getElementById("bar").style.width = strengthPercent(q.answer) + "%";
+
+  document.getElementById("explain").innerHTML = `
+    <strong>${selected === q.answer ? "正解！" : "不正解…"}</strong><br>
+    正解：${q.answer}<br>
+    ${q.explain}
+    <button class="next" onclick="next()">次の問題へ</button>
+  `;
+
+  setTimeout(()=>{
+    next();
+  },2000);
+}
+
+function next(){
+  index++;
+  if(index >= questions.length){
+    finish();
+  }else{
+    render();
+  }
+}
+
+function finish(){
+  let comment = "";
+
+  if(score >= 18){
+    comment = "かなりセキュリティ感覚があります！";
+  }else if(score >= 14){
+    comment = "良い感じです。危険なパスワードをかなり見抜けています。";
+  }else if(score >= 9){
+    comment = "普通レベルです。単語・誕生日・連番には注意しましょう。";
+  }else{
+    comment = "まだ危険なパスワードを見逃しがちです。長さ・記号・ランダム性を意識しましょう。";
+  }
+
+  document.getElementById("app").innerHTML = `
+    <div class="card result">
+      <h2>結果発表</h2>
+      <p style="font-size:28px;font-weight:900">${score} / ${questions.length}</p>
+      <p>${comment}</p>
+      <button class="restart" onclick="restart()">もう一度遊ぶ</button>
+    </div>
+  `;
+}
+
+function restart(){
+  index = 0;
+  score = 0;
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
